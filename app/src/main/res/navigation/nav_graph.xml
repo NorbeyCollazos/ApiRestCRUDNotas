@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/listaNotasFragment">
+
+    <fragment
+        android:id="@+id/listaNotasFragment"
+        android:name="com.ncrdesarrollo.apirestcrudnotas.fragments.ListaNotasFragment"
+        android:label="fragment_lista_notas"
+        tools:layout="@layout/fragment_lista_notas" >
+        <action
+            android:id="@+id/action_listaNotasFragment_to_registrarNotaFragment"
+            app:destination="@id/registrarNotaFragment" />
+        <action
+            android:id="@+id/action_listaNotasFragment_to_editarNotaFragment"
+            app:destination="@id/editarNotaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editarNotaFragment"
+        android:name="com.ncrdesarrollo.apirestcrudnotas.fragments.EditarNotaFragment"
+        android:label="fragment_editar_nota"
+        tools:layout="@layout/fragment_editar_nota" >
+        <action
+            android:id="@+id/action_editarNotaFragment_to_listaNotasFragment"
+            app:destination="@id/listaNotasFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/registrarNotaFragment"
+        android:name="com.ncrdesarrollo.apirestcrudnotas.fragments.RegistrarNotaFragment"
+        android:label="fragment_registrar_nota"
+        tools:layout="@layout/fragment_registrar_nota" >
+        <action
+            android:id="@+id/action_registrarNotaFragment_to_listaNotasFragment"
+            app:destination="@id/listaNotasFragment" />
+    </fragment>
+</navigation>
