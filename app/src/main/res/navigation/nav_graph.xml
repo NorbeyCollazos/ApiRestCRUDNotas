@@ -7,32 +7,44 @@
 
     <fragment
         android:id="@+id/listaNotasFragment"
-        android:name="com.ncrdesarrollo.apirestcrudnotas.fragments.ListaNotasFragment"
-        android:label="fragment_lista_notas"
-        tools:layout="@layout/fragment_lista_notas" >
+        android:name="com.ncrdesarrollo.apirestcrudnotas.views.fragments.ListaNotasFragment"
+        android:label="Lista de notas"
+        tools:layout="@layout/fragment_lista_notas">
         <action
             android:id="@+id/action_listaNotasFragment_to_registrarNotaFragment"
             app:destination="@id/registrarNotaFragment" />
         <action
             android:id="@+id/action_listaNotasFragment_to_editarNotaFragment"
             app:destination="@id/editarNotaFragment" />
+        <action
+            android:id="@+id/action_listaNotasFragment_to_detalleNotaFragment"
+            app:destination="@id/detalleNotaFragment" />
     </fragment>
     <fragment
         android:id="@+id/editarNotaFragment"
-        android:name="com.ncrdesarrollo.apirestcrudnotas.fragments.EditarNotaFragment"
-        android:label="fragment_editar_nota"
-        tools:layout="@layout/fragment_editar_nota" >
+        android:name="com.ncrdesarrollo.apirestcrudnotas.views.fragments.EditarNotaFragment"
+        android:label="Editar nota"
+        tools:layout="@layout/fragment_editar_nota">
         <action
             android:id="@+id/action_editarNotaFragment_to_listaNotasFragment"
             app:destination="@id/listaNotasFragment" />
     </fragment>
     <fragment
         android:id="@+id/registrarNotaFragment"
-        android:name="com.ncrdesarrollo.apirestcrudnotas.fragments.RegistrarNotaFragment"
-        android:label="fragment_registrar_nota"
-        tools:layout="@layout/fragment_registrar_nota" >
+        android:name="com.ncrdesarrollo.apirestcrudnotas.views.fragments.RegistrarNotaFragment"
+        android:label="Registrar nota"
+        tools:layout="@layout/fragment_registrar_nota">
         <action
             android:id="@+id/action_registrarNotaFragment_to_listaNotasFragment"
+            app:destination="@id/listaNotasFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detalleNotaFragment"
+        android:name="com.ncrdesarrollo.apirestcrudnotas.views.fragments.DetalleNotaFragment"
+        android:label="Detalle de nota"
+        tools:layout="@layout/fragment_detalle_nota">
+        <action
+            android:id="@+id/action_detalleNotaFragment_to_listaNotasFragment"
             app:destination="@id/listaNotasFragment" />
     </fragment>
 </navigation>
