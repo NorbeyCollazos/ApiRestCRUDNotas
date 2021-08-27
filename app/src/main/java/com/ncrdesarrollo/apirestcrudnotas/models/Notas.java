@@ -5,14 +5,16 @@ public class Notas {
     private String id;
     private String titulo;
     private String nota;
+    private String imagen;
 
     public Notas() {
     }
 
-    public Notas(String id, String titulo, String nota) {
+    public Notas(String id, String titulo, String nota, String imagen) {
         this.id = id;
         this.titulo = titulo;
         this.nota = nota;
+        this.imagen = imagen;
     }
 
     public String getId() {
@@ -37,5 +39,13 @@ public class Notas {
 
     public void setNota(String nota) {
         this.nota = nota;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 }

@@ -99,7 +99,7 @@ public class ListaNotasFragment extends Fragment implements INotasPresenter.View
     }
 
     @Override
-    public void mostrarDatos(String titulo, String nota) {
+    public void mostrarDatos(String titulo, String nota, String imagen) {
 
     }
 
