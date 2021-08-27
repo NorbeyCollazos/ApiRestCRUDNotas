@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import com.ncrdesarrollo.apirestcrudnotas.R;
 import com.ncrdesarrollo.apirestcrudnotas.models.Notas;
 import com.ncrdesarrollo.apirestcrudnotas.presenter.INotasPresenter;
 import com.ncrdesarrollo.apirestcrudnotas.presenter.NotasPresenter;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class DetalleNotaFragment extends Fragment implements INotasPresenter.Vie
     private TextView txtNota;
     private Button btnEditar;
     private Button btnEliminar;
+    private ImageView imgFoto;
     private ProgressBar progressBar;
     private NotasPresenter presenter;
 
@@ -54,6 +57,7 @@ public class DetalleNotaFragment extends Fragment implements INotasPresenter.Vie
         presenter = new NotasPresenter(getActivity(),this);
         txtTitulo = view.findViewById(R.id.txtTitulo);
         txtNota = view.findViewById(R.id.txtNota);
+        imgFoto = view.findViewById(R.id.imgFoto);
         progressBar = view.findViewById(R.id.progressBar3);
         btnEditar = view.findViewById(R.id.btnEditar);
         btnEliminar = view.findViewById(R.id.btnEliminar);
@@ -124,9 +128,12 @@ public class DetalleNotaFragment extends Fragment implements INotasPresenter.Vie
     }
 
     @Override
-    public void mostrarDatos(String titulo, String nota) {
+    public void mostrarDatos(String titulo, String nota, String imagen) {
         txtTitulo.setText(titulo);
         txtNota.setText(nota);
+        if (!imagen.isEmpty()) {
+            Picasso.with(getActivity()).load(imagen).into(imgFoto);
+        }
     }
 
     @Override

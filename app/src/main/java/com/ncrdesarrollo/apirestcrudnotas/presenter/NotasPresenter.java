@@ -59,6 +59,7 @@ public class NotasPresenter implements INotasPresenter.Presenter {
                                 Notas model = new Notas();
                                 model.setId(jsonObject.getString("id"));
                                 model.setTitulo(jsonObject.getString("titulo"));
+                                model.setImagen(jsonObject.getString("imagen"));
                                 notasList.add(model);
                                 view.putDataInRecycler(notasList);
 
@@ -82,7 +83,6 @@ public class NotasPresenter implements INotasPresenter.Presenter {
                             view.msgError("No hay conexión a internet");
                         }
 
-                        Log.i("error", error.getMessage());
                     }
                 }
         );
@@ -91,7 +91,7 @@ public class NotasPresenter implements INotasPresenter.Presenter {
     }
 
     @Override
-    public void registrarDatos(String titulo, String nota) {
+    public void registrarDatos(String titulo, String nota, String imagen) {
         if (titulo.isEmpty() || nota.isEmpty()){
             view.msgError("Por favor completa los campos");
         }else {
@@ -101,6 +101,7 @@ public class NotasPresenter implements INotasPresenter.Presenter {
                 jsonBody.put("type", "aplication/json");
                 jsonBody.put("titulo", titulo);
                 jsonBody.put("nota", nota);
+                jsonBody.put("imagen", imagen);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -141,7 +142,11 @@ public class NotasPresenter implements INotasPresenter.Presenter {
                     JSONArray jsonArray = new JSONArray(response);
                     JSONObject jsonObject = jsonArray.getJSONObject(0);
 
-                    view.mostrarDatos(jsonObject.getString("titulo"),jsonObject.getString("nota"));
+                    view.mostrarDatos(
+                            jsonObject.getString("titulo"),
+                            jsonObject.getString("nota"),
+                            jsonObject.getString("imagen")
+                            );
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -163,7 +168,7 @@ public class NotasPresenter implements INotasPresenter.Presenter {
     }
 
     @Override
-    public void modificarDatos(String id, String titulo, String nota) {
+    public void modificarDatos(String id, String titulo, String nota, String imagen) {
         if (titulo.isEmpty() || nota.isEmpty()) {
             view.msgError("Campos incompletos");
         }else{
@@ -176,6 +181,7 @@ public class NotasPresenter implements INotasPresenter.Presenter {
                 jsonBody.put("id", id);
                 jsonBody.put("titulo", titulo);
                 jsonBody.put("nota", nota);
+                jsonBody.put("imagen", imagen);
 
             } catch (JSONException e) {
                 e.printStackTrace();
