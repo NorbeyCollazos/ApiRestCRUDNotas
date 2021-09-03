@@ -2,92 +2,55 @@ package com.ncrdesarrollo.apirestcrudnotas.presenter;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.android.volley.NoConnectionError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.ServerError;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.ncrdesarrollo.apirestcrudnotas.api.APIRest;
+import com.ncrdesarrollo.apirestcrudnotas.api.AdaptadorRetrofit;
 import com.ncrdesarrollo.apirestcrudnotas.models.Notas;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
+
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
 
 public class NotasPresenter implements INotasPresenter.Presenter {
 
     Context context;
     INotasPresenter.View view;
-    private String URL = "http://apirestcrudnotas.ncrdesarrollo.com/notas";
-    private RequestQueue requestQueue;
     private List<Notas> notasList;
+    Retrofit retrofit;
+    APIRest api;
 
     public NotasPresenter(Context context, INotasPresenter.View view) {
         this.context = context;
         this.view = view;
         notasList = new ArrayList<>();
-        requestQueue = Volley.newRequestQueue(context);
+        retrofit = new AdaptadorRetrofit().getAdapter();
+        api = retrofit.create(APIRest.class);
     }
 
     @Override
     public void listarDatos() {
         view.showProgress();
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
-                Request.Method.GET,
-                URL,
-                null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        view.hideProgress();
+        Call<List<Notas>> call = api.obtenerNotas();
+        call.enqueue(new Callback<List<Notas>>() {
+            @Override
+            public void onResponse(Call<List<Notas>> call, retrofit2.Response<List<Notas>> response) {
+                view.hideProgress();
+                notasList = new ArrayList<Notas>(response.body());
+                view.putDataInRecycler(notasList);
 
-                        try {
-                            int size = response.length();
-                            for (int i = 0; i < size; i++){
-                                JSONObject jsonObject = new JSONObject(response.get(i).toString());
-                                Notas model = new Notas();
-                                model.setId(jsonObject.getString("id"));
-                                model.setTitulo(jsonObject.getString("titulo"));
-                                model.setImagen(jsonObject.getString("imagen"));
-                                notasList.add(model);
-                                view.putDataInRecycler(notasList);
+            }
 
+            @Override
+            public void onFailure(Call<List<Notas>> call, Throwable t) {
 
-                            }
+            }
+        });
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Log.i("lista", e.getMessage());
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        view.hideProgress();
-                        if (error instanceof ServerError){
-                            view.msgError("Error en el servidor");
-                        }
-                        if (error instanceof NoConnectionError){
-                            view.msgError("No hay conexión a internet");
-                        }
-
-                    }
-                }
-        );
-
-        requestQueue.add(jsonArrayRequest);
     }
 
     @Override
@@ -96,151 +59,134 @@ public class NotasPresenter implements INotasPresenter.Presenter {
             view.msgError("Por favor completa los campos");
         }else {
             view.showProgress();
-            JSONObject jsonBody = new JSONObject();
-            try {
-                jsonBody.put("type", "aplication/json");
-                jsonBody.put("titulo", titulo);
-                jsonBody.put("nota", nota);
-                jsonBody.put("imagen", imagen);
 
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            Notas notas = new Notas();
+            notas.setTitulo(titulo);
+            notas.setNota(nota);
+            notas.setImagen(imagen);
 
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>() {
+            Call<Void> call = api.agregarNota(notas);
+            call.enqueue(new Callback<Void>() {
                 @Override
-                public void onResponse(JSONObject response) {
-                    view.hideProgress();
-                    view.msgSucces("Se registró con éxito");
+                public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
+                    switch (response.code()){
+                        case 400:
+                            view.msgError("Campos incompletos");
+                            break;
+
+                        case 200:
+                            view.hideProgress();
+                            view.msgSucces("Se registró con éxito");
+                            break;
+                    }
                 }
-            }, new Response.ErrorListener() {
+
                 @Override
-                public void onErrorResponse(VolleyError error) {
-                    view.hideProgress();
-                    view.hideProgress();
-                    if (error instanceof ServerError){
-                        view.msgError("Error en el servidor");
-                    }
-                    if (error instanceof NoConnectionError){
-                        view.msgError("No hay conexión a internet");
-                    }
+                public void onFailure(Call<Void> call, Throwable t) {
+
                 }
             });
-
-            Volley.newRequestQueue(context).add(request);
         }
     }
 
     @Override
     public void verDatos(String id) {
+        Log.i("datos", id);
         view.showProgress();
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL+"?id="+id, new Response.Listener<String>() {
+
+        Call<List<Notas>> call = api.obtenerNota(id);
+        Log.i("datos", call.toString());
+        call.enqueue(new Callback<List<Notas>>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(Call<List<Notas>> call, retrofit2.Response<List<Notas>> response) {
+
                 view.hideProgress();
-                try {
-                    JSONArray jsonArray = new JSONArray(response);
-                    JSONObject jsonObject = jsonArray.getJSONObject(0);
+                notasList = new ArrayList<Notas>(response.body());
+                Log.i("datos", notasList.get(0).getTitulo());
+                view.mostrarDatos(
+                        notasList.get(0).getTitulo(),
+                        notasList.get(0).getNota(),
+                        notasList.get(0).getImagen()
+                );
 
-                    view.mostrarDatos(
-                            jsonObject.getString("titulo"),
-                            jsonObject.getString("nota"),
-                            jsonObject.getString("imagen")
-                            );
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
             }
-        }, new Response.ErrorListener() {
+
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onFailure(Call<List<Notas>> call, Throwable t) {
                 view.hideProgress();
-                if (error instanceof ServerError){
-                    view.msgError("Error en el servidor");
-                }
-                if (error instanceof NoConnectionError){
-                    view.msgError("No hay conexión a internet");
-                }
+                Log.i("error", t.getMessage());
             }
         });
-        Volley.newRequestQueue(context).add(stringRequest);
+
     }
 
     @Override
     public void modificarDatos(String id, String titulo, String nota, String imagen) {
-        if (titulo.isEmpty() || nota.isEmpty()) {
-            view.msgError("Campos incompletos");
-        }else{
 
+        if (titulo.isEmpty() || nota.isEmpty()){
+            view.msgError("Por favor completa los campos");
+        }else {
             view.showProgress();
 
-            JSONObject jsonBody = new JSONObject();
-            try {
-                jsonBody.put("type", "aplication/json");
-                jsonBody.put("id", id);
-                jsonBody.put("titulo", titulo);
-                jsonBody.put("nota", nota);
-                jsonBody.put("imagen", imagen);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
+            Notas notas = new Notas();
+            notas.setId(id);
+            notas.setTitulo(titulo);
+            notas.setNota(nota);
+            if (!imagen.isEmpty()){
+                notas.setImagen(imagen);
             }
 
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, URL, jsonBody, new Response.Listener<JSONObject>() {
+            Call<Void> call = api.editarNota(notas);
+            call.enqueue(new Callback<Void>() {
                 @Override
-                public void onResponse(JSONObject response) {
-                    view.hideProgress();
-                    view.msgSucces("Se modificó el registro");
+                public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
+                    switch (response.code()){
+                        case 400:
+                            view.msgError("Campos incompletos");
+                            break;
+
+                        case 200:
+                            view.hideProgress();
+                            view.msgSucces("Se editó el registro");
+                            break;
+                    }
                 }
-            }, new Response.ErrorListener() {
+
                 @Override
-                public void onErrorResponse(VolleyError error) {
-                    view.hideProgress();
-                    if (error instanceof ServerError){
-                        view.msgError("Error en el servidor");
-                    }
-                    if (error instanceof NoConnectionError){
-                        view.msgError("No hay conexión a internet");
-                    }
+                public void onFailure(Call<Void> call, Throwable t) {
 
                 }
             });
-
-            Volley.newRequestQueue(context).add(request);
         }
+
     }
 
     @Override
     public void eliminarDatos(String id) {
         view.showProgress();
-        StringRequest request = new StringRequest(Request.Method.DELETE, URL, new Response.Listener<String>() {
+
+        Call<Void> call = api.eliminarNota(id);
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
                 view.hideProgress();
-                view.msgSucces("Se eliminó el registro");
+                switch (response.code()) {
+                    case 200:
+                        view.msgSucces("Se eliminó la nota");
+                        break;
+                    case 204:
+                        view.msgError("No se puedo eliminar");
+                        break;
+
+                }
             }
-        }, new Response.ErrorListener() {
+
             @Override
-            public void onErrorResponse(VolleyError error) {
-                view.hideProgress();
-                if (error instanceof ServerError){
-                    view.msgError("Error en el servidor");
-                }
-                if (error instanceof NoConnectionError){
-                    view.msgError("No hay conexión a internet");
-                }
+            public void onFailure(Call<Void> call, Throwable t) {
 
             }
-        }){
-            public Map<String, String> getHeaders() {
-                Map<String, String> params = new HashMap<>();
-                params.put("id", id);
-                return params;
-            }
-        };
-
-        Volley.newRequestQueue(context).add(request);
+        });
     }
 
 }

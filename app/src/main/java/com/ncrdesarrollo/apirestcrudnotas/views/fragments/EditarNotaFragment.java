@@ -42,7 +42,7 @@ public class EditarNotaFragment extends Fragment implements INotasPresenter.View
     private TextInputLayout etTitulo;
     private TextInputLayout etNota;
     private Button btnEditar;
-    private String sImagen;
+    private String sImagen = "";
     private ImageView imgFoto;
     private ProgressBar progressBar;
     private NotasPresenter presenter;
@@ -163,10 +163,12 @@ public class EditarNotaFragment extends Fragment implements INotasPresenter.View
 
     @Override
     public void mostrarDatos(String titulo, String nota, String imagen) {
+
         etTitulo.getEditText().setText(titulo);
         etNota.getEditText().setText(nota);
         if (!imagen.isEmpty()) {
             Picasso.with(getActivity()).load(imagen).into(imgFoto);
+            //sImagen = imagen;
         }
     }
 
